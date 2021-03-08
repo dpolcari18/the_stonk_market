@@ -6,16 +6,62 @@ document.addEventListener("DOMContentLoaded", () => {
 })
 
 function renderUserPage(user) {
-    console.log(user)
+    // console.log(user)
+    // debugger
+
+    let loginForm = document.getElementById('login-form')
+        loginForm.remove()
+
+    let centerColumn = document.getElementById('center-column')
+
+    let navBar = document.getElementById('navbar')
+        navBar.style.display="block"
+
+    let userTable = document.createElement('table')
+        userTable.classList.add('table-light')
+
+    let tableHead = document.createElement('thead')
+
+    let headerRow = document.createElement('tr')
+
+    let companyHeader = document.createElement('th')
+        companyHeader.innerText = 'Company - Symbol'
+
+    let quantityHeader = document.createElement('th')
+        quantityHeader.innerText = 'Shares'
+
+    let priceHeader = document.createElement('th')
+        priceHeader.innerText = 'Price Per Share'
+
+    let valueHeader = document.createElement('th')
+        valueHeader.innerText = 'Total Value'
+
+    let tableBody = document.createElement('tbody')
+
+    user.investments.forEach(investment => {
+        let newRow = document.createElement('tr')
+
+        let companyCell = document.createElement('td')
+        let company =  user.companies.find(company => company.id === investment.company_id)
+            companyCell.innerText = `${company.description} - ${company.symbol}`
+            
+        let sharesCell = document.createElement('td')
+            sharesCell.innerText = `${investment.quantity}`
+            
+        let sharePriceCell = document.createElement('td')
+
+        let invValueCell = document.createElement('td')
+
+        newRow.append(companyCell, sharesCell, sharePriceCell, invValueCell)
+        tableBody.appendChild(newRow)
+        })
+
+    headerRow.append(companyHeader, quantityHeader, priceHeader, valueHeader)
+    tableHead.appendChild(headerRow)
+    userTable.append(tableHead, tableBody)
+    centerColumn.appendChild(userTable)
+
     
-    // let navDiv = document.createElement('div')
-
-    // let navBar = document.createElement('nav')
-    //     navBar.classList.add('navbar', 'navbar-expand-lg', 'navbar-light', 'bg-light')
-
-    // document.getElementById('first-div').prepend(navBar)
-
-
 }
 
 async function fetchUser(currentUser) {
@@ -126,10 +172,11 @@ function renderSignUpForm(loginForm, formDiv) {
 }
 
 function createForm() {
-    let formDiv = document.getElementById('form')
+    let formDiv = document.getElementById('center-column')
         formDiv.innerHTML = ''
 
     let loginForm = document.createElement('form')
+        loginForm.id = 'login-form'
         loginForm.style.background = 'white'
         loginForm.style.border = "thick solid #FFFFFF"
         loginForm.style.borderRadius = '5px'
