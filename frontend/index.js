@@ -34,6 +34,12 @@ function renderSignUpForm(loginForm, formDiv) {
         signUpForm.style.borderRadius = '5px'
         signUpForm.style.padding = "15px"
 
+    // CREATE SUBMIT FORM EVENT LISTENER
+    signUpForm.addEventListener('submit', (e) => {
+        e.preventDefault()
+        console.log('submitted')
+    })
+
      let signUpText = document.createElement('h4')
         signUpText.style.textAlign = 'center'
     
