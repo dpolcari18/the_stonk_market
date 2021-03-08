@@ -113,7 +113,7 @@ function renderSignUpForm(loginForm, formDiv) {
 
     let signUpBtn = document.createElement('button')
         signUpBtn.innerText = 'Sign Up'
-        signUpBtn.classList.add('btn', 'btn-primary')
+        signUpBtn.classList.add('btn', 'btn-success')
         signUpBtn.style.margin = 'auto'
 
     let buttonDiv = document.createElement('div')
@@ -165,7 +165,7 @@ function createForm() {
         
     let loginBtn = document.createElement('button')
         loginBtn.innerText = 'Login'
-        loginBtn.classList.add('btn', 'btn-primary')
+        loginBtn.classList.add('btn', 'btn-success')
         loginBtn.style.margin = 'auto'
 
     let signUpBtn = document.createElement('button')
