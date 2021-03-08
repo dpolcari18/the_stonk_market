@@ -5,11 +5,24 @@ document.addEventListener("DOMContentLoaded", () => {
     createForm()
 })
 
+function renderUserPage(user) {
+    console.log(user)
+    
+    // let navDiv = document.createElement('div')
+
+    // let navBar = document.createElement('nav')
+    //     navBar.classList.add('navbar', 'navbar-expand-lg', 'navbar-light', 'bg-light')
+
+    // document.getElementById('first-div').prepend(navBar)
+
+
+}
+
 async function fetchUser(currentUser) {
     const loggedIn = await fetch(USERS_URL+currentUser.id)
     const foundUser = await loggedIn.json()
 
-    console.log(foundUser)
+    renderUserPage(foundUser)
 } 
 
 function findUser(users, user) {    
@@ -39,7 +52,7 @@ async function signUP(username, first_name, last_name) {
     const postedUser = await createUser.json()
     
     if (postedUser.status === "success") {
-        console.log(postedUser)
+        fetchUser(postedUser.user)
     } else if (postedUser.status === "error") {
         alert(postedUser.errors.join('\n'))
     }
