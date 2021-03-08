@@ -25,6 +25,27 @@ async function getUsers(user) {
     findUser(parsedUsers, user)
 }
 
+async function signUP(username, first_name, last_name) {
+    let newUser = {
+        headers: {"Content-Type": "application/json"},
+        method: "POST",
+        body: JSON.stringify({
+            username: username,
+            first_name: first_name,
+            last_name: last_name
+        })
+    }
+    const createUser = await fetch(USERS_URL, newUser)
+    const postedUser = await createUser.json()
+    
+    if (postedUser.status === "success") {
+        console.log(postedUser)
+    } else if (postedUser.status === "error") {
+        alert(postedUser.errors.join('\n'))
+    }
+}
+
+
 function renderSignUpForm(loginForm, formDiv) {
     loginForm.remove()
 
@@ -37,7 +58,10 @@ function renderSignUpForm(loginForm, formDiv) {
     // CREATE SUBMIT FORM EVENT LISTENER
     signUpForm.addEventListener('submit', (e) => {
         e.preventDefault()
-        console.log('submitted')
+        let username = e.target.username.value
+        let firstName = e.target.firstName.value
+        let lastName = e.target.lastName.value
+        signUP(username, firstName, lastName)
     })
 
      let signUpText = document.createElement('h4')
