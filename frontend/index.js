@@ -49,7 +49,7 @@ async function createRow(investment, user, tableBody) {
         tableBody.appendChild(newRow)
 }
 
-function renderTable(user) {
+async function renderTable(user) {
     let centerColumn = document.getElementById('center-column')
         centerColumn.classList = 'col-md-6'
     
@@ -82,7 +82,7 @@ function renderTable(user) {
     headerRow.append(companyHeader, quantityHeader, priceHeader, valueHeader)
     tableHead.appendChild(headerRow)
     userTable.append(tableHead, tableBody)
-    centerColumn.appendChild(userTable)
+    await centerColumn.appendChild(userTable)
 }
 
 async function findCompany(company) {
