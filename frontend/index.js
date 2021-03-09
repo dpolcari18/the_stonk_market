@@ -17,40 +17,89 @@ async function fetchSharePrice(symbol) {
     return stock
 }
 
+function renderSellForm(investment, sharePrice, company, newRow) {
+    let centerColumn = document.getElementById('center-column')
+
+    let sellDiv = document.createElement('div')
+    
+    let sellForm = document.createElement('form')
+        sellForm.id = "sell-form"
+    
+    let sellTitle = document.createElement('h4')
+        sellTitle.innerText = `Sell ${company.description} Shares`
+
+    let inputDiv = document.createElement('div')
+
+    let sharesLabel = document.createElement('label')
+        sharesLabel.innerText = 'Shares: '    
+
+    let sharesInput = document.createElement('input')
+        sharesInput.placeholder = 'Enter Number of Shares'
+        sharesInput.name = 'shares'
+
+    inputDiv.append(sharesLabel, sharesInput)
+
+    let value = document.createElement('div')
+        value = "Value: NEED TO FIGURE THIS OUT"
+
+    let buttonDiv = document.createElement('div')
+        buttonDiv.classList.add('btn-toolbar')
+
+    let cancelButton = document.createElement('button')
+        cancelButton.classList.add('btn', 'btn-secondary')
+        cancelButton.innerText = 'Cancel'
+        cancelButton.style.margin = 'auto'
+
+        cancelButton.addEventListener('click', () => {
+            sellDiv.remove()
+        })
+
+    let sellButton = document.createElement('button')
+        sellButton.classList.add('btn', 'btn-success')
+        sellButton.innerText = 'SELL'
+        sellButton.style.margin = 'auto'
+
+    buttonDiv.append(cancelButton, sellButton)
+    
+    sellForm.append(sellTitle, inputDiv, value, buttonDiv)
+    sellDiv.appendChild(sellForm)
+    centerColumn.appendChild(sellDiv)
+}
+
 async function createRow(investment, user, tableBody) {
     let newRow = document.createElement('tr')
 
-        let companyCell = document.createElement('td')
-        let company =  user.companies.find(company => company.id === investment.company_id)
-            companyCell.innerText = `${company.description} - ${company.symbol}`
-            companyCell.classList.add('align-middle')
-            
-        let sharesCell = document.createElement('td')
-            sharesCell.innerText = `${investment.quantity}`
-            sharesCell.classList.add('align-middle')
-            
-        let sharePriceCell = document.createElement('td')
-            sharePriceCell.classList.add('align-middle')
-        let sharePrice = await fetchSharePrice(company.symbol)
-            sharePriceCell.innerText = `$${sharePrice["c"]}`
+    let companyCell = document.createElement('td')
+    let company =  user.companies.find(company => company.id === investment.company_id)
+        companyCell.innerText = `${company.description} - ${company.symbol}`
+        companyCell.classList.add('align-middle')
+        
+    let sharesCell = document.createElement('td')
+        sharesCell.innerText = `${investment.quantity}`
+        sharesCell.classList.add('align-middle')
+        
+    let sharePriceCell = document.createElement('td')
+        sharePriceCell.classList.add('align-middle')
+    let sharePrice = await fetchSharePrice(company.symbol)
+        sharePriceCell.innerText = `$${sharePrice["c"]}`
 
-        let invValueCell = document.createElement('td')
-            invValueCell.classList.add('align-middle')
-            invValueCell.innerText = '$'+sharePrice["c"]*sharesCell.innerText
+    let invValueCell = document.createElement('td')
+        invValueCell.classList.add('align-middle')
+        invValueCell.innerText = '$'+sharePrice["c"]*sharesCell.innerText
 
-        let buttonCell = document.createElement('td')
+    let buttonCell = document.createElement('td')
 
-        let sellButton = document.createElement('button')
-            sellButton.innerText = 'SELL'
-            sellButton.classList.add('btn', 'btn-outline-success', 'btn-sm')
-            sellButton.addEventListener('click', () => {
-                renderSellForm(investment, )
-            })
+    let sellButton = document.createElement('button')
+        sellButton.innerText = 'SELL'
+        sellButton.classList.add('btn', 'btn-outline-success', 'btn-sm')
+        sellButton.addEventListener('click', () => {
+            renderSellForm(investment, sharePrice, company, newRow)
+        })
 
-        buttonCell.appendChild(sellButton)
+    buttonCell.appendChild(sellButton)
 
-        newRow.append(companyCell, sharesCell, sharePriceCell, invValueCell, buttonCell )
-        tableBody.appendChild(newRow)
+    newRow.append(companyCell, sharesCell, sharePriceCell, invValueCell, buttonCell )
+    tableBody.appendChild(newRow)
 }
 
 async function renderTable(user) {
@@ -229,10 +278,6 @@ function renderSignUpForm(loginForm, formDiv) {
     loginForm.remove()
 
     let signUpForm = document.createElement('form')
-        signUpForm.style.background = 'white'
-        signUpForm.style.border = "thick solid #FFFFFF"
-        signUpForm.style.borderRadius = '5px'
-        signUpForm.style.padding = "15px"
 
     // CREATE SUBMIT FORM EVENT LISTENER
     signUpForm.addEventListener('submit', (e) => {
@@ -297,10 +342,6 @@ function createForm() {
 
     let loginForm = document.createElement('form')
         loginForm.id = 'login-form'
-        loginForm.style.background = 'white'
-        loginForm.style.border = "thick solid #FFFFFF"
-        loginForm.style.borderRadius = '5px'
-        loginForm.style.padding = "15px"
 
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault()
