@@ -1,11 +1,22 @@
 const USERS_URL = 'http://localhost:3000/users/'
 const COMP_URL = 'http://localhost:3000/companies/'
+const QUOTE_URL = 'https://finnhub.io/api/v1/quote?'
 
 document.addEventListener("DOMContentLoaded", () => {
     createForm()
 })
 
-function createRow(investment, user, tableBody) {
+async function fetchSharePrice(symbol) {
+    let searchSymbol = `symbol=${symbol}`
+    let token = `&token=${config.EXT_KEY}`
+    
+    const res = await fetch(QUOTE_URL+searchSymbol+token)
+    const stock = await res.json()
+
+    return stock
+}
+
+async function createRow(investment, user, tableBody) {
     let newRow = document.createElement('tr')
 
         let companyCell = document.createElement('td')
@@ -19,9 +30,12 @@ function createRow(investment, user, tableBody) {
             
         let sharePriceCell = document.createElement('td')
             sharePriceCell.classList.add('align-middle')
+        let sharePrice = await fetchSharePrice(company.symbol)
+            sharePriceCell.innerText = `$${sharePrice["c"]}`
 
         let invValueCell = document.createElement('td')
             invValueCell.classList.add('align-middle')
+            invValueCell.innerText = '$'+sharePrice["c"]*sharesCell.innerText
 
         let buttonCell = document.createElement('td')
 
@@ -78,7 +92,7 @@ async function findCompany(company) {
     return foundComp
 }
 
-async function createCard(company, user) {
+async function createCard(company) {
     let rightColumn = document.getElementById('right-column')
 
     let newCard = document.createElement('div')
@@ -129,7 +143,7 @@ async function createCard(company, user) {
 
 function renderCards(user) {
 
-    user.watchlists.forEach(company => createCard(company, user))
+    user.watchlists.forEach(company => createCard(company))
 }
 
 function renderUserPage(user) {
