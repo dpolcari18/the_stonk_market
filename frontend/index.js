@@ -13,12 +13,16 @@ function renderUserPage(user) {
         loginForm.remove()
 
     let centerColumn = document.getElementById('center-column')
+        centerColumn.classList = 'col-md-6'
 
     let navBar = document.getElementById('navbar')
         navBar.style.display="block"
 
     let userTable = document.createElement('table')
-        userTable.classList.add('table-light')
+        userTable.classList.add('table-light', 'table-hover', 'table-bordered')
+        userTable.style.borderColor = "#000000"
+        userTable.style.textAlign = "center"
+        userTable.style.borderWidth = "4px"
 
     let tableHead = document.createElement('thead')
 
@@ -29,9 +33,13 @@ function renderUserPage(user) {
 
     let quantityHeader = document.createElement('th')
         quantityHeader.innerText = 'Shares'
+        quantityHeader.style.textAlign = "center"
+        quantityHeader.style.borderWidth = "4px"
 
     let priceHeader = document.createElement('th')
         priceHeader.innerText = 'Price Per Share'
+        priceHeader.style.textAlign = "center"
+        priceHeader.style.borderWidth = "4px"
 
     let valueHeader = document.createElement('th')
         valueHeader.innerText = 'Total Value'
