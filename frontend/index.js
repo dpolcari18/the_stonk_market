@@ -1,4 +1,3 @@
-
 const USERS_URL = 'http://localhost:3000/users/'
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -16,12 +15,13 @@ function renderUserPage(user) {
         navBar.style.display="block"
 
     let userTable = document.createElement('table')
-        userTable.classList.add('table-light', 'table-hover', 'table-bordered')
-        userTable.style.borderColor = "#000000"
-        userTable.style.textAlign = "center"
-        userTable.style.borderWidth = "4px"
+        userTable.classList.add('table', 'table-light', 'table-hover')
+        // userTable.style.borderColor = "#000000"
+        // userTable.style.textAlign = "center"
+        // userTable.style.borderWidth = "4px"
 
     let tableHead = document.createElement('thead')
+        tableHead.style.borderBottom = "5px solid red"
 
     let headerRow = document.createElement('tr')
 
@@ -30,13 +30,13 @@ function renderUserPage(user) {
 
     let quantityHeader = document.createElement('th')
         quantityHeader.innerText = 'Shares'
-        quantityHeader.style.textAlign = "center"
-        quantityHeader.style.borderWidth = "4px"
+        // quantityHeader.style.textAlign = "center"
+        // quantityHeader.style.borderWidth = "4px"
 
     let priceHeader = document.createElement('th')
         priceHeader.innerText = 'Price Per Share'
-        priceHeader.style.textAlign = "center"
-        priceHeader.style.borderWidth = "4px"
+        // priceHeader.style.textAlign = "center"
+        // priceHeader.style.borderWidth = "4px"
 
     let valueHeader = document.createElement('th')
         valueHeader.innerText = 'Total Value'
@@ -59,6 +59,7 @@ function renderUserPage(user) {
 
         let sellButton = document.createElement('button')
             sellButton.innerText = 'SELL'
+            sellButton.style.margin = "0 auto"
             sellButton.classList.add('btn', 'btn-outline-success', 'btn-sm')
 
         newRow.append(companyCell, sharesCell, sharePriceCell, invValueCell, sellButton)
