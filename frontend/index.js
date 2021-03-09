@@ -4,24 +4,45 @@ document.addEventListener("DOMContentLoaded", () => {
     createForm()
 })
 
-function renderUserPage(user) {
-    let loginForm = document.getElementById('login-form')
-        loginForm.remove()
+function createRow(investment, user, tableBody) {
+    let newRow = document.createElement('tr')
 
+        let companyCell = document.createElement('td')
+        let company =  user.companies.find(company => company.id === investment.company_id)
+            companyCell.innerText = `${company.description} - ${company.symbol}`
+            companyCell.classList.add('align-middle')
+            
+        let sharesCell = document.createElement('td')
+            sharesCell.innerText = `${investment.quantity}`
+            sharesCell.classList.add('align-middle')
+            
+        let sharePriceCell = document.createElement('td')
+            sharePriceCell.classList.add('align-middle')
+
+        let invValueCell = document.createElement('td')
+            invValueCell.classList.add('align-middle')
+
+        let buttonCell = document.createElement('td')
+
+        let sellButton = document.createElement('button')
+            sellButton.innerText = 'SELL'
+            sellButton.classList.add('btn', 'btn-outline-success', 'btn-sm')
+
+        buttonCell.appendChild(sellButton)
+
+        newRow.append(companyCell, sharesCell, sharePriceCell, invValueCell, buttonCell )
+        tableBody.appendChild(newRow)
+}
+
+function renderTable(user) {
     let centerColumn = document.getElementById('center-column')
         centerColumn.classList = 'col-md-6'
-
-    let navBar = document.getElementById('navbar')
-        navBar.style.display="block"
-
+    
     let userTable = document.createElement('table')
-        userTable.classList.add('table', 'table-light', 'table-hover')
-        // userTable.style.borderColor = "#000000"
-        // userTable.style.textAlign = "center"
-        // userTable.style.borderWidth = "4px"
+    userTable.classList.add('table', 'table-light', 'table-hover')
 
     let tableHead = document.createElement('thead')
-        tableHead.style.borderBottom = "5px solid red"
+        // tableHead.style.borderBottom = "2px solid green"
 
     let headerRow = document.createElement('tr')
 
@@ -30,13 +51,9 @@ function renderUserPage(user) {
 
     let quantityHeader = document.createElement('th')
         quantityHeader.innerText = 'Shares'
-        // quantityHeader.style.textAlign = "center"
-        // quantityHeader.style.borderWidth = "4px"
 
     let priceHeader = document.createElement('th')
         priceHeader.innerText = 'Price Per Share'
-        // priceHeader.style.textAlign = "center"
-        // priceHeader.style.borderWidth = "4px"
 
     let valueHeader = document.createElement('th')
         valueHeader.innerText = 'Total Value'
@@ -44,35 +61,16 @@ function renderUserPage(user) {
     let tableBody = document.createElement('tbody')
 
     user.investments.forEach(investment => {
-        let newRow = document.createElement('tr')
-
-        let companyCell = document.createElement('td')
-        let company =  user.companies.find(company => company.id === investment.company_id)
-            companyCell.innerText = `${company.description} - ${company.symbol}`
-            
-        let sharesCell = document.createElement('td')
-            sharesCell.innerText = `${investment.quantity}`
-            
-        let sharePriceCell = document.createElement('td')
-
-        let invValueCell = document.createElement('td')
-
-        let sellButton = document.createElement('button')
-            sellButton.innerText = 'SELL'
-            sellButton.style.margin = "0 auto"
-            sellButton.classList.add('btn', 'btn-outline-success', 'btn-sm')
-
-        newRow.append(companyCell, sharesCell, sharePriceCell, invValueCell, sellButton)
-        tableBody.appendChild(newRow)
+        createRow(investment, user, tableBody)
         })
 
     headerRow.append(companyHeader, quantityHeader, priceHeader, valueHeader)
     tableHead.appendChild(headerRow)
     userTable.append(tableHead, tableBody)
     centerColumn.appendChild(userTable)
+}
 
-    //card template
-    
+function createCard(company, user) {
     let rightColumn = document.getElementById('right-column')
 
     let newCard = document.createElement('div')
@@ -84,7 +82,8 @@ function renderUserPage(user) {
 
     let companySymbol = document.createElement('h3')
         companySymbol.classList.add('card-title')
-        companySymbol.innerText = 'GME'
+    let findCompany = user.companies.find(comp => comp.id === company.company_id)
+        companySymbol.innerText = `${findCompany.symbol}`
 
     let price = document.createElement('h4')
         price.classList.add('card-subtitle')
@@ -119,6 +118,23 @@ function renderUserPage(user) {
     rightColumn.appendChild(newCard)
 }
 
+function renderCards(user) {
+
+    user.watchlists.forEach(company => createCard(company, user))
+}
+
+function renderUserPage(user) {
+    let loginForm = document.getElementById('login-form')
+        loginForm.remove()
+
+    let navBar = document.getElementById('navbar')
+        navBar.style.display="block"
+
+    renderTable(user)
+
+    renderCards(user)
+}
+
 async function fetchUser(currentUser) {
     const loggedIn = await fetch(USERS_URL+currentUser.id)
     const foundUser = await loggedIn.json()
@@ -139,7 +155,7 @@ async function getUsers(user) {
     findUser(parsedUsers, user)
 }
 
-async function signUP(username, first_name, last_name) {
+async function signUp(username, first_name, last_name) {
     let newUser = {
         headers: {"Content-Type": "application/json"},
         method: "POST",
@@ -159,7 +175,6 @@ async function signUP(username, first_name, last_name) {
     }
 }
 
-
 function renderSignUpForm(loginForm, formDiv) {
     loginForm.remove()
 
@@ -175,7 +190,7 @@ function renderSignUpForm(loginForm, formDiv) {
         let username = e.target.username.value
         let firstName = e.target.firstName.value
         let lastName = e.target.lastName.value
-        signUP(username, firstName, lastName)
+        signUp(username, firstName, lastName)
     })
 
      let signUpText = document.createElement('h4')
