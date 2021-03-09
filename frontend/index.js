@@ -6,9 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
 })
 
 function renderUserPage(user) {
-    // console.log(user)
-    // debugger
-
     let loginForm = document.getElementById('login-form')
         loginForm.remove()
 
@@ -52,7 +49,11 @@ function renderUserPage(user) {
 
         let invValueCell = document.createElement('td')
 
-        newRow.append(companyCell, sharesCell, sharePriceCell, invValueCell)
+        let sellButton = document.createElement('button')
+            sellButton.innerText = 'SELL'
+            sellButton.classList.add('btn', 'btn-outline-success', 'btn-sm')
+
+        newRow.append(companyCell, sharesCell, sharePriceCell, invValueCell, sellButton)
         tableBody.appendChild(newRow)
         })
 
@@ -60,8 +61,6 @@ function renderUserPage(user) {
     tableHead.appendChild(headerRow)
     userTable.append(tableHead, tableBody)
     centerColumn.appendChild(userTable)
-
-    
 }
 
 async function fetchUser(currentUser) {
