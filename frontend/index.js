@@ -105,22 +105,24 @@ async function createCard(company) {
     let companySymbol = document.createElement('h3')
         companySymbol.classList.add('card-title')
     
-        let showCompany = await findCompany(company)
+    let showCompany = await findCompany(company)
         companySymbol.innerText = `${showCompany.symbol}`
+
+    let sharePrice = await fetchSharePrice(showCompany.symbol)
 
     let price = document.createElement('h4')
         price.classList.add('card-subtitle')
-        price.innerText = 'Current: $100'
+        price.innerText = `Current: $${sharePrice["c"]}`
 
     let dailyDiv = document.createElement('div')
 
     let high = document.createElement('h5')
         high.classList.add('card-subtitle')
-        high.innerText = 'High: $1000'
+        high.innerText = `High: $${sharePrice["h"]}`
     
     let low = document.createElement('h5')
         low.classList.add('card-subtitle')
-        low.innerText = 'Low: $40'
+        low.innerText = `Low: $${sharePrice["l"]}`
 
     dailyDiv.append(high,low)
 
