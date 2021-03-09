@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  resources :watchlists
+  resources :watchlists, only: [:destroy]
   resources :investments
   resources :users, only: [:show, :index, :create]
   resources :companies, only: [:show]

@@ -1,5 +1,6 @@
 const USERS_URL = 'http://localhost:3000/users/'
 const COMP_URL = 'http://localhost:3000/companies/'
+const WATCH_URL = 'http://localhost:3000/watchlists/'
 const QUOTE_URL = 'https://finnhub.io/api/v1/quote?'
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -92,12 +93,30 @@ async function findCompany(company) {
     return foundComp
 }
 
+async function removeWatchlist(e, company) {
+    // console.log(e, company)
+    // debugger
+    let delObj = {
+        headers: {
+            "Content-Type": "application/json"
+        },
+        method: "DELETE"
+    }
+
+    const delWatchlist = await fetch(WATCH_URL+company.id, delObj)
+    const delStatus = await delWatchlist.json()
+
+    e.target.parentElement.parentElement.parentElement.remove()
+
+    console.log(delStatus)
+}
+
 async function createCard(company) {
     let rightColumn = document.getElementById('right-column')
 
     let newCard = document.createElement('div')
         newCard.classList.add('card')
-        newCard.style = 'width: 14rem'
+        newCard.style = 'width: 16rem'
 
     let cardBody = document.createElement('div')
         cardBody.classList.add('card-body')
@@ -135,6 +154,9 @@ async function createCard(company) {
     let remove = document.createElement('a')
         remove.innerText = 'Remove'
         remove.classList.add('card-link')
+        remove.addEventListener('click', (e) => {
+            removeWatchlist(e, company)
+        })
 
     linkDiv.append(buy, remove)
     cardBody.append(companySymbol, price, dailyDiv, linkDiv)
