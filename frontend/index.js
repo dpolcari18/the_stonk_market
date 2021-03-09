@@ -43,6 +43,9 @@ async function createRow(investment, user, tableBody) {
         let sellButton = document.createElement('button')
             sellButton.innerText = 'SELL'
             sellButton.classList.add('btn', 'btn-outline-success', 'btn-sm')
+            sellButton.addEventListener('click', () => {
+                renderSellForm(investment, )
+            })
 
         buttonCell.appendChild(sellButton)
 
