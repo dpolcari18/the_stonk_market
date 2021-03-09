@@ -1,6 +1,7 @@
 const USERS_URL = 'http://localhost:3000/users/'
 const COMP_URL = 'http://localhost:3000/companies/'
 const WATCH_URL = 'http://localhost:3000/watchlists/'
+const INV_URL = 'http://localhost:3000/investments/'
 const QUOTE_URL = 'https://finnhub.io/api/v1/quote?'
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -17,6 +18,52 @@ async function fetchSharePrice(symbol) {
     return stock
 }
 
+async function sellInvestment(sellObj, investment) {
+    const sell = await fetch(INV_URL+investment.id, sellObj)
+    const resp = await sell.json()
+
+    return resp
+}
+
+async function sellShares(e, investment, newRow, sellDiv) {
+    console.log(e, investment, newRow)
+    
+    if (+e.target.shares.value === investment.quantity) {
+        //DELETE Request
+        let sellObj = {
+            headers: {
+                "Content-Type": "application/json"
+            },
+            method: "DELETE"
+        }
+
+        await sellInvestment(sellObj, investment)
+        sellDiv.remove()
+        newRow.remove()
+
+    } else {
+        //PATCH Request
+        let updatedObj = {
+            id: investment.id,
+            quantity: investment.quantity-e.target.shares.value
+        }
+        
+        let sellObj = {
+            headers: {
+                "Content-Type": "application/json"
+            },
+            method: "PATCH",
+            body: JSON.stringify(updatedObj)
+        }
+
+        let sold = await sellInvestment(sellObj, investment)
+        sellDiv.remove()
+        
+        newRow.children[1].innerText = sold.quantity
+        newRow.children[3].innerText = `$${sold.quantity*(+newRow.children[2].innerText.substring(1))}`
+    }
+}
+
 function renderSellForm(investment, sharePrice, company, newRow) {
     let centerColumn = document.getElementById('center-column')
 
@@ -24,6 +71,10 @@ function renderSellForm(investment, sharePrice, company, newRow) {
     
     let sellForm = document.createElement('form')
         sellForm.id = "sell-form"
+        sellForm.addEventListener('submit', (e) => {
+            e.preventDefault()
+            sellShares(e, investment, newRow, sellDiv)
+        })
     
     let sellTitle = document.createElement('h4')
         sellTitle.innerText = `Sell ${company.description} Shares`
@@ -68,6 +119,7 @@ function renderSellForm(investment, sharePrice, company, newRow) {
 
 async function createRow(investment, user, tableBody) {
     let newRow = document.createElement('tr')
+        newRow.dataset.investmentId = `${investment.id}`
 
     let companyCell = document.createElement('td')
     let company =  user.companies.find(company => company.id === investment.company_id)
@@ -108,7 +160,7 @@ async function renderTable(user) {
     
     let userTable = document.createElement('table')
         userTable.classList.add('table', 'table-light', 'table-hover')
-
+        
     let tableHead = document.createElement('thead')
         // tableHead.style.borderBottom = "2px solid green"
 
