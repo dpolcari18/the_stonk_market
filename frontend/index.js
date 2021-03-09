@@ -6,9 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
 })
 
 function renderUserPage(user) {
-    // console.log(user)
-    // debugger
-
     let loginForm = document.getElementById('login-form')
         loginForm.remove()
 
@@ -60,7 +57,11 @@ function renderUserPage(user) {
 
         let invValueCell = document.createElement('td')
 
-        newRow.append(companyCell, sharesCell, sharePriceCell, invValueCell)
+        let sellButton = document.createElement('button')
+            sellButton.innerText = 'SELL'
+            sellButton.classList.add('btn', 'btn-outline-success', 'btn-sm')
+
+        newRow.append(companyCell, sharesCell, sharePriceCell, invValueCell, sellButton)
         tableBody.appendChild(newRow)
         })
 
@@ -69,7 +70,52 @@ function renderUserPage(user) {
     userTable.append(tableHead, tableBody)
     centerColumn.appendChild(userTable)
 
+    //card template
     
+    let rightColumn = document.getElementById('right-column')
+
+    let newCard = document.createElement('div')
+        newCard.classList.add('card')
+        newCard.style = 'width: 14rem'
+
+    let cardBody = document.createElement('div')
+        cardBody.classList.add('card-body')
+
+    let companySymbol = document.createElement('h3')
+        companySymbol.classList.add('card-title')
+        companySymbol.innerText = 'GME'
+
+    let price = document.createElement('h4')
+        price.classList.add('card-subtitle')
+        price.innerText = 'Current: $100'
+
+    let dailyDiv = document.createElement('div')
+
+    let high = document.createElement('h5')
+        high.classList.add('card-subtitle')
+        high.innerText = 'High: $1000'
+    
+    let low = document.createElement('h5')
+        low.classList.add('card-subtitle')
+        low.innerText = 'Low: $40'
+
+    dailyDiv.append(high,low)
+
+    let linkDiv = document.createElement('div')
+
+    let buy = document.createElement('a')
+        buy.innerText = 'BUY'
+        buy.classList.add('card-link')
+
+    let remove = document.createElement('a')
+        remove.innerText = 'Remove'
+        remove.classList.add('card-link')
+
+    linkDiv.append(buy, remove)
+    cardBody.append(companySymbol, price, dailyDiv, linkDiv)
+    newCard.appendChild(cardBody)
+
+    rightColumn.appendChild(newCard)
 }
 
 async function fetchUser(currentUser) {
