@@ -7,6 +7,7 @@ class InvestmentsController < ApplicationController
 
     def destroy
         investment = Investment.find_by(id: params[:id])
-
+        investment.destroy
+        render json: investment
     end
 end
