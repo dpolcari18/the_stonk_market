@@ -1,4 +1,5 @@
 const USERS_URL = 'http://localhost:3000/users/'
+const COMP_URL = 'http://localhost:3000/companies/'
 
 document.addEventListener("DOMContentLoaded", () => {
     createForm()
@@ -70,7 +71,14 @@ function renderTable(user) {
     centerColumn.appendChild(userTable)
 }
 
-function createCard(company, user) {
+async function findCompany(company) {
+    const res = await fetch(COMP_URL+`${company.company_id}`)
+    const foundComp = await res.json()
+
+    return foundComp
+}
+
+async function createCard(company, user) {
     let rightColumn = document.getElementById('right-column')
 
     let newCard = document.createElement('div')
@@ -82,9 +90,9 @@ function createCard(company, user) {
 
     let companySymbol = document.createElement('h3')
         companySymbol.classList.add('card-title')
-        debugger
-    let findCompany = user.companies.find(comp => comp.id === company.company_id)
-        companySymbol.innerText = `${findCompany.symbol}`
+    
+        let showCompany = await findCompany(company)
+        companySymbol.innerText = `${showCompany.symbol}`
 
     let price = document.createElement('h4')
         price.classList.add('card-subtitle')
@@ -130,7 +138,7 @@ function renderUserPage(user) {
 
     let navBar = document.getElementById('navbar')
         navBar.style.display="block"
-
+        
     renderTable(user)
 
     renderCards(user)
