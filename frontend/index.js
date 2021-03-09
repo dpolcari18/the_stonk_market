@@ -39,7 +39,7 @@ function renderTable(user) {
         centerColumn.classList = 'col-md-6'
     
     let userTable = document.createElement('table')
-    userTable.classList.add('table', 'table-light', 'table-hover')
+        userTable.classList.add('table', 'table-light', 'table-hover')
 
     let tableHead = document.createElement('thead')
         // tableHead.style.borderBottom = "2px solid green"
@@ -82,6 +82,7 @@ function createCard(company, user) {
 
     let companySymbol = document.createElement('h3')
         companySymbol.classList.add('card-title')
+        debugger
     let findCompany = user.companies.find(comp => comp.id === company.company_id)
         companySymbol.innerText = `${findCompany.symbol}`
 
