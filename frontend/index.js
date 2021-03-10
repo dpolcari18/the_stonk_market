@@ -174,7 +174,6 @@ async function renderTable(user) {
         userTable.style.borderRadius = '5px'
         
     let tableHead = document.createElement('thead')
-        // tableHead.style.borderBottom = "2px solid green"
 
     let headerRow = document.createElement('tr')
 
@@ -329,8 +328,15 @@ function renderPurchaseTable(company, sharePrice) {
         buyBtn.classList.add('btn', 'btn-success')
         buyBtn.innerText = 'BUY'
 
+    let follow = document.createElement('td')
+
+    let followBtn = document.createElement('button')
+        followBtn.classList.add('btn', 'btn-outline-secondary')
+        followBtn.innerText = 'Follow'
+
     buy.appendChild(buyBtn)
-    bodyRow.append(name, symbol, price, buy)
+    follow.appendChild(followBtn)
+    bodyRow.append(name, symbol, price, buy, follow)
     searchBody.appendChild(bodyRow)
     searchTable.append(searchHead, searchBody)
     centerColumn.appendChild(searchTable)
@@ -349,9 +355,8 @@ function renderUserPage(user) {
     let homeBtn = document.getElementById('home-btn')
     homeBtn.addEventListener('click', () => {
         document.getElementById('center-column').innerHTML = ''
-        document.getElementById('right-column').innerHTML = ''
 
-        renderUserPage(user)
+        renderTable(user)
     })
 
     let searchInput = document.getElementById('search-form')
