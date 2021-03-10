@@ -201,8 +201,8 @@ async function renderTable(user) {
     await centerColumn.appendChild(userTable)
 }
 
-async function findCompany(company) {
-    const res = await fetch(COMP_URL+`${company.company_id}`)
+async function findCompany(companyId) {
+    const res = await fetch(COMP_URL+`${companyId}`)
     const foundComp = await res.json()
 
     return foundComp
@@ -225,6 +225,7 @@ async function removeWatchlist(e, company) {
 }
 
 async function createCard(company) {
+
     let rightColumn = document.getElementById('right-column')
 
     let newCard = document.createElement('div')
@@ -237,7 +238,7 @@ async function createCard(company) {
     let companySymbol = document.createElement('h3')
         companySymbol.classList.add('card-title')
     
-    let showCompany = await findCompany(company)
+    let showCompany = await findCompany(company.company_id)
         companySymbol.innerText = `${showCompany.symbol}`
 
     let sharePrice = await fetchSharePrice(showCompany.symbol)
@@ -284,7 +285,32 @@ function renderCards(user) {
     user.watchlists.forEach(company => createCard(company))
 }
 
-function renderPurchaseTable(company, sharePrice) {
+async function followCompany(company, user) {
+    let newFollow = {
+        user_id: user.id,
+        company_id: company.id
+    }
+
+    let reqObj = {
+        headers: {
+            "Content-Type": "application/json"
+        },
+        method: "POST",
+        body: JSON.stringify(newFollow)
+    }
+
+    const postFollow = await fetch(WATCH_URL, reqObj)
+    const resp = await postFollow.json()
+    
+
+    if (resp.status === 'success'){
+        createCard(resp.watchlist)
+    } else if (resp.status === 'error') {
+            alert(resp.errors)
+    }
+}
+
+function renderPurchaseTable(company, sharePrice, user) {
     
     let centerColumn = document.getElementById('center-column')
         centerColumn.innerHTML = ''
@@ -333,6 +359,10 @@ function renderPurchaseTable(company, sharePrice) {
     let followBtn = document.createElement('button')
         followBtn.classList.add('btn', 'btn-outline-secondary')
         followBtn.innerText = 'Follow'
+        followBtn.addEventListener('click', () => {
+            // working here
+            followCompany(company, user)
+        })
 
     buy.appendChild(buyBtn)
     follow.appendChild(followBtn)
@@ -377,7 +407,7 @@ function renderUserPage(user) {
                         newLi.addEventListener('click', async function()  {
                             searchList.innerHTML = ''
                             let sharePrice = await fetchSharePrice(company.symbol, company)
-                            renderPurchaseTable(company, sharePrice)
+                            renderPurchaseTable(company, sharePrice, user)
                         })
     
                     searchList.appendChild(newLi)
