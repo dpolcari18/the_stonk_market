@@ -145,7 +145,7 @@ async function createRow(investment, user, tableBody) {
 
     let invValueCell = document.createElement('td')
         invValueCell.classList.add('align-middle')
-        invValueCell.innerText = '$'+sharePrice["c"]*sharesCell.innerText
+        invValueCell.innerText = '$'+((sharePrice["c"]*sharesCell.innerText).toFixed(2))
 
     let buttonCell = document.createElement('td')
 
@@ -244,17 +244,17 @@ async function createCard(company) {
 
     let price = document.createElement('h4')
         price.classList.add('card-subtitle')
-        price.innerText = `Current: $${sharePrice["c"]}`
+        price.innerText = `Current: $${(sharePrice["c"]).toFixed(2)}`
 
     let dailyDiv = document.createElement('div')
 
     let high = document.createElement('h5')
         high.classList.add('card-subtitle')
-        high.innerText = `High: $${sharePrice["h"]}`
+        high.innerText = `High: $${(sharePrice["h"]).toFixed(2)}`
     
     let low = document.createElement('h5')
         low.classList.add('card-subtitle')
-        low.innerText = `Low: $${sharePrice["l"]}`
+        low.innerText = `Low: $${(sharePrice["l"]).toFixed(2)}`
 
     dailyDiv.append(high,low)
 
