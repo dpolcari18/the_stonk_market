@@ -4,8 +4,7 @@ const WATCH_URL = 'http://localhost:3000/watchlists/'
 const INV_URL = 'http://localhost:3000/investments/'
 const QUOTE_URL = 'https://finnhub.io/api/v1/quote?'
 
-let companies
-
+let compSearchList
 
 document.addEventListener("DOMContentLoaded", () => {
     fetchCompanies()
@@ -14,10 +13,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function fetchCompanies() {
     const res = await fetch(COMP_URL)
-    companies = await res.json()
+    compSearchList = await res.json()
 }
 
-async function fetchSharePrice(symbol) {
+async function fetchSharePrice(symbol, company=undefined) {
     let searchSymbol = `symbol=${symbol}`
     let token = `&token=${config.EXT_KEY}`
     
@@ -164,11 +163,15 @@ async function createRow(investment, user, tableBody) {
 }
 
 async function renderTable(user) {
+    let leftColumn = document.getElementById('left-column')
+        leftColumn.classList = 'col-sm-1'
+    
     let centerColumn = document.getElementById('center-column')
         centerColumn.classList = 'col-md-6'
     
     let userTable = document.createElement('table')
         userTable.classList.add('table', 'table-light', 'table-hover')
+        userTable.style.borderRadius = '5px'
         
     let tableHead = document.createElement('thead')
         // tableHead.style.borderBottom = "2px solid green"
@@ -281,6 +284,57 @@ function renderCards(user) {
     user.watchlists.forEach(company => createCard(company))
 }
 
+function renderPurchaseTable(company, sharePrice) {
+    
+    let centerColumn = document.getElementById('center-column')
+        centerColumn.innerHTML = ''
+
+    let searchTable = document.createElement('table')
+        searchTable.classList.add('table', 'table-light')
+        searchTable.style.borderRadius = '5px'
+
+    let searchHead = document.createElement('thead')
+
+    let headerRow = document.createElement('tr')
+
+    let companyName = document.createElement('th')
+        companyName.innerText = 'Company'
+    
+    let companySymbol = document.createElement('th')
+        companySymbol.innerText = 'Symbol'
+    
+    let companyPrice = document.createElement('th')
+        companyPrice.innerText = 'Price per Share'
+    
+    headerRow.append(companyName, companySymbol, companyPrice)
+    searchHead.appendChild(headerRow)
+
+    let searchBody = document.createElement('tbody')
+
+    let bodyRow = document.createElement('tr')
+
+    let name = document.createElement('td')
+        name.innerText = `${company.description}`
+    
+    let symbol = document.createElement('td')
+        symbol.innerText = `${company.symbol}`
+    
+    let price = document.createElement('td')
+        price.innerText = `$${sharePrice["c"]}`
+
+    let buy = document.createElement('td')
+
+    let buyBtn = document.createElement('button')
+        buyBtn.classList.add('btn', 'btn-success')
+        buyBtn.innerText = 'BUY'
+
+    buy.appendChild(buyBtn)
+    bodyRow.append(name, symbol, price, buy)
+    searchBody.appendChild(bodyRow)
+    searchTable.append(searchHead, searchBody)
+    centerColumn.appendChild(searchTable)
+} 
+
 function renderUserPage(user) {
     let loginForm = document.getElementById('login-form')
         loginForm.remove()
@@ -290,7 +344,28 @@ function renderUserPage(user) {
 
     let searchInput = document.getElementById('search-form')
         searchInput.addEventListener('keyup', (e) => {
-            console.log(e.target.value)
+            let searchList = document.getElementById('search-list')
+            if (e.target.value === '') {
+                searchList.innerHTML=''
+            } else {
+                let searchStr = e.target.value.toLowerCase()
+                const filteredCompanies = compSearchList.filter(company => {
+                    return company.description.toLowerCase().includes(searchStr) || company.symbol.toLowerCase().includes(searchStr)
+                })
+                searchList.innerHTML = ''
+                filteredCompanies.forEach(company => {
+                    let newLi = document.createElement('li')
+                        newLi.classList.add('list-group-item')
+                        newLi.innerText = `${company.description} - ${company.symbol}`
+                        newLi.addEventListener('click', async function()  {
+                            searchList.innerHTML = ''
+                            let sharePrice = await fetchSharePrice(company.symbol, company)
+                            renderPurchaseTable(company, sharePrice)
+                        })
+    
+                    searchList.appendChild(newLi)
+                })
+            }
         })
         
     renderTable(user)
