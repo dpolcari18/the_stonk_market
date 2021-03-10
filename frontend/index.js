@@ -230,7 +230,7 @@ async function createCard(company) {
 
     let newCard = document.createElement('div')
         newCard.classList.add('card')
-        newCard.style = 'width: 16rem'
+        newCard.style = 'width: 16rem; margin: 0 0 10px 0'
 
     let cardBody = document.createElement('div')
         cardBody.classList.add('card-body')
@@ -280,7 +280,8 @@ async function createCard(company) {
 }
 
 function renderCards(user) {
-
+    let rightColumn = document.getElementById('right-column')
+        rightColumn.innerHTML = ''
     user.watchlists.forEach(company => createCard(company))
 }
 
@@ -335,12 +336,23 @@ function renderPurchaseTable(company, sharePrice) {
     centerColumn.appendChild(searchTable)
 } 
 
-function renderUserPage(user) {
+function renderUserPage(user) {    
     let loginForm = document.getElementById('login-form')
-        loginForm.remove()
+        if (loginForm) {loginForm.remove()}
+
+    let signUpForm = document.getElementById('sign-up-form')
+        if (signUpForm) {signUpForm.remove()}
 
     let navBar = document.getElementById('navbar')
         navBar.style.display="block"
+
+    let homeBtn = document.getElementById('home-btn')
+    homeBtn.addEventListener('click', () => {
+        document.getElementById('center-column').innerHTML = ''
+        document.getElementById('right-column').innerHTML = ''
+
+        renderUserPage(user)
+    })
 
     let searchInput = document.getElementById('search-form')
         searchInput.addEventListener('keyup', (e) => {
@@ -417,6 +429,7 @@ function renderSignUpForm(loginForm, formDiv) {
     loginForm.remove()
 
     let signUpForm = document.createElement('form')
+        signUpForm.id = 'sign-up-form'
 
     // CREATE SUBMIT FORM EVENT LISTENER
     signUpForm.addEventListener('submit', (e) => {

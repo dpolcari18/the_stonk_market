@@ -13,6 +13,8 @@ form {
     padding: 0;
     position: absolute;
     width: 330px;
+    max-height: 500px;
+    overflow-y: auto;
 }
 
 .list-group > li {
@@ -26,3 +28,4 @@ form {
 .list-group > li:last-child {
   border-bottom: 1px solid gray;
 }
+
