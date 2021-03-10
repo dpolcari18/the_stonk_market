@@ -4,12 +4,18 @@ const WATCH_URL = 'http://localhost:3000/watchlists/'
 const INV_URL = 'http://localhost:3000/investments/'
 const QUOTE_URL = 'https://finnhub.io/api/v1/quote?'
 
-const COMPANIES = fetch(COMP_URL).then(res => res.json()).then(companies => companies)
+let companies
 
 
 document.addEventListener("DOMContentLoaded", () => {
+    fetchCompanies()
     createForm()
 })
+
+async function fetchCompanies() {
+    const res = await fetch(COMP_URL)
+    companies = await res.json()
+}
 
 async function fetchSharePrice(symbol) {
     let searchSymbol = `symbol=${symbol}`
@@ -282,7 +288,10 @@ function renderUserPage(user) {
     let navBar = document.getElementById('navbar')
         navBar.style.display="block"
 
-    let searchForm = document.getElementById('search-form')
+    let searchInput = document.getElementById('search-form')
+        searchInput.addEventListener('keyup', (e) => {
+            console.log(e.target.value)
+        })
         
     renderTable(user)
 
