@@ -3,4 +3,9 @@ class CompaniesController < ApplicationController
         company = Company.find_by(id: params[:id])
         render json: company
     end 
+
+    def index 
+        companies = Company.all
+        render json: companies, except: [:created_at, :updated_at]
+    end
 end

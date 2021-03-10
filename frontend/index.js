@@ -4,6 +4,9 @@ const WATCH_URL = 'http://localhost:3000/watchlists/'
 const INV_URL = 'http://localhost:3000/investments/'
 const QUOTE_URL = 'https://finnhub.io/api/v1/quote?'
 
+const COMPANIES = fetch(COMP_URL).then(res => res.json()).then(companies => companies)
+
+
 document.addEventListener("DOMContentLoaded", () => {
     createForm()
 })
@@ -198,8 +201,6 @@ async function findCompany(company) {
 }
 
 async function removeWatchlist(e, company) {
-    // console.log(e, company)
-    // debugger
     let delObj = {
         headers: {
             "Content-Type": "application/json"
@@ -280,6 +281,8 @@ function renderUserPage(user) {
 
     let navBar = document.getElementById('navbar')
         navBar.style.display="block"
+
+    let searchForm = document.getElementById('search-form')
         
     renderTable(user)
 
