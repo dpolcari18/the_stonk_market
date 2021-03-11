@@ -315,28 +315,56 @@ async function followCompany(company, user) {
 async function buyShares(e, user, company) {
     let companyId = company.symbol ? company.id : company.company_id
     let tableBody = document.getElementById('user-table-body')
-    // debugger
-    let newInv = {
-        user_id: user.id,
-        company_id: companyId,
-        quantity: +e.target.shares.value
-    }
     
-    let reqObj = {
-        headers: {
-            "Content-Type": "application/json"
-        },
-        method: "POST",
-        body: JSON.stringify(newInv)
-    }
-    
-    const buy = await fetch(INV_URL, reqObj)
-    const buyRes = await buy.json()
-    if (tableBody) {
-        createRow(buyRes, user, tableBody)
+    let findInv = user.investments.find(inv=> inv.company_id === companyId)
+
+    if (findInv) {
+        //PATCH
+        let patchInv = {
+            quantity: findInv.quantity + (+e.target.shares.value)
+        }
+
+        let patchObj = {
+            headers: {
+                "Content-Type": "application/json"
+            },
+            method: "PATCH",
+            body: JSON.stringify(patchInv)
+        }
+
+        const reqObj = await fetch(INV_URL+findInv.id, patchObj)
+        const patchRes = await reqObj.json()
+        if (tableBody) {
+            let updateRow = document.querySelectorAll(`[data-investment-id='${findInv.id}']`)
+            updateRow[0].childNodes[1].innerText = patchRes.quantity
+        } else {
+            document.getElementById('center-column').innerHTML = ''
+            renderTable(user)
+        } 
     } else {
-        document.getElementById('center-column').innerHTML = ''
-        renderTable(user)
+        //POST
+        let postInv = {
+            user_id: user.id,
+            company_id: companyId,
+            quantity: +e.target.shares.value
+        }
+        
+        let reqObj = {
+            headers: {
+                "Content-Type": "application/json"
+            },
+            method: "POST",
+            body: JSON.stringify(postInv)
+        }
+        
+        const buy = await fetch(INV_URL, reqObj)
+        const buyRes = await buy.json()
+        if (tableBody) {
+            createRow(buyRes, user, tableBody)
+        } else {
+            document.getElementById('center-column').innerHTML = ''
+            renderTable(user)
+        }
     }
 }
 
