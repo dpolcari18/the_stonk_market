@@ -93,7 +93,7 @@ function renderSellForm(investment, sharePrice, company, newRow) {
         sellForm.id = "sell-form"
         sellForm.addEventListener('submit', (e) => {
             e.preventDefault()
-            if (window.confirm(`Confirm Sale: ${e.target.shares.value} share(s) of ${company.description} for $${((+e.target.shares.value)*(sharePrice["c"]).toFixed(2))}?`)) {
+            if (window.confirm(`Confirm Sale: ${e.target.shares.value} share(s) of ${company.description} for $${((+e.target.shares.value)*(sharePrice["c"])).toFixed(2)}?`)) {
                 sellShares(e, investment, newRow, sellDiv)
             }
         })
@@ -330,7 +330,7 @@ async function followCompany(company, user) {
 async function buyShares(e, user, company) {
     let companyId = company.symbol ? company.id : company.company_id
     let tableBody = document.getElementById('user-table-body')
-    
+
     let findInv = user.investments.find(inv=> inv.company_id === companyId)
 
     if (findInv) {
@@ -352,7 +352,7 @@ async function buyShares(e, user, company) {
         if (tableBody) {
             let updateRow = document.querySelectorAll(`[data-investment-id='${findInv.id}']`)
             updateRow[0].childNodes[1].innerText = patchRes.quantity
-        } else {
+        } else if(patchRes) {
             document.getElementById('center-column').innerHTML = ''
             let newUser = await fetchUser(user)
             renderTable(newUser)
@@ -380,6 +380,7 @@ async function buyShares(e, user, company) {
         } else {
             document.getElementById('center-column').innerHTML = ''
             renderTable(user)
+            createRow(buyRes, user, tableBody)
         }
     }
 }
@@ -515,7 +516,8 @@ function renderPurchaseTable(company, sharePrice, user) {
     centerColumn.appendChild(searchTable)
 } 
 
-function renderUserPage(user) {    
+function renderUserPage(user) {
+   
     let loginForm = document.getElementById('login-form')
         if (loginForm) {loginForm.remove()}
 
