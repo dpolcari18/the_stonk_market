@@ -10,6 +10,18 @@ form {
     overflow-y: auto;
 }
 
+thead {
+    display: inline-block;
+    width: 100%;
+    height: 50px;
+}
+tbody {
+    height: 200px;
+    display: inline-block;
+    width: 100%;
+    overflow: auto;
+}
+
 #right-column::-webkit-scrollbar { 
     display: none; 
 }

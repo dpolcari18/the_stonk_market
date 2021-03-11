@@ -196,6 +196,7 @@ async function renderTable(user) {
         userTable.style.borderRadius = '5px'
         
     let tableHead = document.createElement('thead')
+        tableHead.classList.add('fixed-header')
 
     let headerRow = document.createElement('tr')
 
@@ -213,6 +214,7 @@ async function renderTable(user) {
 
     let tableBody = document.createElement('tbody')
         tableBody.id = 'user-table-body'
+        tableBody.classList.add('scroll-table')
 
     user.investments.forEach(investment => {
         createRow(investment, tableBody)
