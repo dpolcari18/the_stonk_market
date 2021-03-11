@@ -6,6 +6,8 @@ const QUOTE_URL = 'https://finnhub.io/api/v1/quote?'
 
 let compSearchList
 
+let globalUser
+
 document.addEventListener("DOMContentLoaded", () => {
     fetchCompanies()
     createForm()
@@ -35,8 +37,7 @@ async function sellInvestment(sellObj, investment) {
 }
 
 async function sellShares(e, investment, newRow, sellDiv) {
-    // console.log(investment.quantity)
-    // debugger
+   
     if (+e.target.shares.value === investment.quantity) {
         //DELETE Request
         let sellObj = {
@@ -139,7 +140,7 @@ function renderSellForm(investment, sharePrice, company, newRow) {
     centerColumn.appendChild(sellDiv)
 }
 
-async function createRow(investment, user, tableBody, company=undefined) {
+async function createRow(investment, tableBody, company=undefined) {
     
     let newRow = document.createElement('tr')
         newRow.dataset.investmentId = `${investment.id}`
@@ -178,7 +179,7 @@ async function createRow(investment, user, tableBody, company=undefined) {
 }
 
 async function renderTable(user) {
-    
+
     let leftColumn = document.getElementById('left-column')
         leftColumn.classList = 'col-sm-1'
     
@@ -209,13 +210,13 @@ async function renderTable(user) {
         tableBody.id = 'user-table-body'
 
     user.investments.forEach(investment => {
-        createRow(investment, user, tableBody)
+        createRow(investment, tableBody)
         })
 
     headerRow.append(companyHeader, quantityHeader, priceHeader, valueHeader)
     tableHead.appendChild(headerRow)
     userTable.append(tableHead, tableBody)
-    await centerColumn.appendChild(userTable)
+    centerColumn.appendChild(userTable)
 }
 
 async function findCompany(companyId) {
@@ -240,6 +241,8 @@ async function removeWatchlist(e, company) {
 }
 
 async function createCard(company, user) {
+
+    globalUser = await fetchUser(user)
 
     let rightColumn = document.getElementById('right-column')
 
@@ -281,7 +284,7 @@ async function createCard(company, user) {
         buy.classList.add('card-link')
         buy.addEventListener('click', () => {
             let confirmCompany = compSearchList.find(comp => comp.id === company.company_id)
-            renderPurchaseForm(user, confirmCompany, showCompany.description)
+            renderPurchaseForm(globalUser, confirmCompany, showCompany.description)
         })
 
     let remove = document.createElement('a')
@@ -298,16 +301,21 @@ async function createCard(company, user) {
     rightColumn.appendChild(newCard)
 }
 
-function renderCards(user) {
+async function renderCards(user) {
+
+    globalUser = await fetchUser(user)
+
     let rightColumn = document.getElementById('right-column')
         rightColumn.innerHTML = ''
         
-    user.watchlists.forEach(company => createCard(company, user))
+    globalUser.watchlists.forEach(company => createCard(company, globalUser))
 }
 
 async function followCompany(company, user) {
+    globalUser = await fetchUser(user)
+
     let newFollow = {
-        user_id: user.id,
+        user_id: globalUser.id,
         company_id: company.id
     }
 
@@ -331,10 +339,12 @@ async function followCompany(company, user) {
 }
 
 async function buyShares(e, user, company) {
+    globalUser = await fetchUser(user)
+
     let companyId = company.symbol ? company.id : company.company_id
     let tableBody = document.getElementById('user-table-body')
 
-    let findInv = user.investments.find(inv=> inv.company_id === companyId)
+    let findInv = globalUser.investments.find(inv=> inv.company_id === companyId)
 
     if (findInv) {
         //PATCH
@@ -357,8 +367,8 @@ async function buyShares(e, user, company) {
             updateRow[0].childNodes[1].innerText = patchRes.quantity
         } else if(patchRes) {
             document.getElementById('center-column').innerHTML = ''
-            let newUser = await fetchUser(user)
-            renderTable(newUser)
+            globalUser = await fetchUser(user)
+            renderTable(globalUser)
         } 
     } else {
         //POST
@@ -379,13 +389,11 @@ async function buyShares(e, user, company) {
         const buy = await fetch(INV_URL, reqObj)
         const buyRes = await buy.json()
         if (tableBody) {
-            createRow(buyRes, user, tableBody, company)
+            createRow(buyRes, tableBody, company)
         } else {
             document.getElementById('center-column').innerHTML = ''
-            let newUser = await fetchUser(user)
-            renderTable(newUser)
-            // let tableBody = document.getElementById('user-table-body')
-            // createRow(buyRes, newUser, tableBody)
+            globalUser = await fetchUser(user)
+            renderTable(globalUser)
         }
     }
 }
@@ -456,7 +464,9 @@ function renderPurchaseForm(user, company, companyName=undefined) {
     centerColumn.appendChild(buyDiv)
 }
 
-function renderPurchaseTable(company, sharePrice, user) {
+async function renderPurchaseTable(company, sharePrice, user) {
+
+    globalUser = await fetchUser(user)
     
     let centerColumn = document.getElementById('center-column')
         centerColumn.innerHTML = ''
@@ -500,7 +510,7 @@ function renderPurchaseTable(company, sharePrice, user) {
         buyBtn.classList.add('btn', 'btn-success')
         buyBtn.innerText = 'BUY'
         buyBtn.addEventListener('click', () => {
-            renderPurchaseForm(user, company)
+            renderPurchaseForm(globalUser, company)
         })
 
     let follow = document.createElement('td')
@@ -521,8 +531,17 @@ function renderPurchaseTable(company, sharePrice, user) {
     centerColumn.appendChild(searchTable)
 } 
 
-function renderUserPage(user) {
-   
+async function fetchUser(currentUser) {
+    
+    const loggedIn = await fetch(USERS_URL+currentUser.id)
+    let foundUser = await loggedIn.json()
+
+    return foundUser
+} 
+
+async function renderUserPage(user) {
+    globalUser = await fetchUser(user)
+
     let loginForm = document.getElementById('login-form')
         if (loginForm) {loginForm.remove()}
 
@@ -533,10 +552,10 @@ function renderUserPage(user) {
         navBar.style.display="block"
 
     let homeBtn = document.getElementById('home-btn')
-    homeBtn.addEventListener('click', () => {
+        homeBtn.addEventListener('click', () => {
         document.getElementById('center-column').innerHTML = ''
 
-        renderTable(user)
+        renderTable(globalUser)
     })
 
     let searchInput = document.getElementById('search-form')
@@ -558,7 +577,7 @@ function renderUserPage(user) {
                             searchList.innerHTML = ''
                             searchInput.value = ''
                             let sharePrice = await fetchSharePrice(company.symbol, company)
-                            renderPurchaseTable(company, sharePrice, user)
+                            renderPurchaseTable(company, sharePrice, globalUser)
                         })
     
                     searchList.appendChild(newLi)
@@ -566,30 +585,9 @@ function renderUserPage(user) {
             }
         })
         
-    renderTable(user)
+    renderTable(globalUser)
 
-    renderCards(user)
-}
-
-async function fetchUser(currentUser) {
-    
-    const loggedIn = await fetch(USERS_URL+currentUser.id)
-    const foundUser = await loggedIn.json()
-
-    renderUserPage(foundUser)
-} 
-
-function findUser(users, user) {    
-    let currentUser = users.find(indv => indv.username === user) 
- 
-    currentUser ? fetchUser(currentUser) : alert("Username is not valid.")
-}
-
-async function getUsers(user) {
-    const users = await fetch(USERS_URL)
-    const parsedUsers = await users.json()
-
-    findUser(parsedUsers, user)
+    renderCards(globalUser)
 }
 
 async function signUp(username, first_name, last_name) {
@@ -673,6 +671,19 @@ function renderSignUpForm(loginForm, formDiv) {
     signUpForm.append(signUpText, usernameDiv, firstNameDiv, lastNameDiv, buttonDiv)
 
     formDiv.appendChild(signUpForm)
+}
+
+function findUser(users, user) {    
+    let currentUser = users.find(indv => indv.username === user) 
+ 
+    currentUser ? renderUserPage(currentUser) : alert("Username is not valid.")
+}
+
+async function getUsers(user) {
+    const users = await fetch(USERS_URL)
+    const parsedUsers = await users.json()
+
+    findUser(parsedUsers, user)
 }
 
 function createForm() {
