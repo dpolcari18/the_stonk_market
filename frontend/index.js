@@ -95,8 +95,13 @@ function renderSellForm(investment, sharePrice, company, newRow) {
     
     let sellForm = document.createElement('form')
         sellForm.id = "sell-form"
-        sellForm.addEventListener('submit', (e) => {
+        sellForm.addEventListener('submit', async function(e) {
             e.preventDefault()
+            
+            loadingSpinner(sellButton, 'Click OK to Confirm')
+
+            let pricing = await fetchSharePrice(company.symbol)
+
             if (window.confirm(`Confirm Sale: ${e.target.shares.value} share(s) of ${company.description} for $${((+e.target.shares.value)*(sharePrice["c"])).toFixed(2)}?`)) {
                 sellShares(e, investment, newRow, sellDiv)
             }
@@ -416,6 +421,9 @@ function renderPurchaseForm(user, company, companyName=undefined) {
         buyForm.id = "buy-form"
         buyForm.addEventListener('submit', async function(e) {
             e.preventDefault()
+
+            loadingSpinner(buyButton, 'Click OK to Confirm')
+
             let pricing = await fetchSharePrice(company.symbol)
 
             if (window.confirm(`Confirm Purchase: ${e.target.shares.value} share(s) of ${company.description} for $${((+e.target.shares.value)*(pricing["c"])).toFixed(2)}?`)) {
@@ -686,6 +694,23 @@ async function getUsers(user) {
     findUser(parsedUsers, user)
 }
 
+function loadingSpinner(button, message) {
+
+    button.disable = true
+    button.innerText = ''
+
+    let btnSpan = document.createElement('span')
+        btnSpan.classList.add('spinner-border', 'spinner-border-sm')
+        btnSpan.setAttribute('role', 'status')
+        btnSpan.setAttribute('aria-hidden', true)
+
+    let loadingSpan = document.createElement('span')
+        loadingSpan.classList.add('visual-hidden')
+        loadingSpan.innerText = `${message}`
+
+    button.append(btnSpan, loadingSpan)
+}
+
 function createForm(message=undefined) {
 
     if (message) {
@@ -701,19 +726,7 @@ function createForm(message=undefined) {
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault()
 
-        loginBtn.disable = true
-        loginBtn.innerText = ''
-
-        let loginSpan = document.createElement('span')
-            loginSpan.classList.add('spinner-border', 'spinner-border-sm')
-            loginSpan.setAttribute('role', 'status')
-            loginSpan.setAttribute('aria-hidden', true)
-
-        let loadingSpan = document.createElement('span')
-            loadingSpan.classList.add('visual-hidden')
-            loadingSpan.innerText = 'Loading...'
-
-        loginBtn.append(loginSpan, loadingSpan)
+        loadingSpinner(loginBtn, 'Loading...')
 
         if (document.activeElement.innerText === 'Loading...') {
             let user = e.target.username.value
