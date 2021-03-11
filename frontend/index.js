@@ -298,6 +298,7 @@ async function createCard(company, user) {
 function renderCards(user) {
     let rightColumn = document.getElementById('right-column')
         rightColumn.innerHTML = ''
+        
     user.watchlists.forEach(company => createCard(company, user))
 }
 
@@ -548,6 +549,7 @@ function renderUserPage(user) {
                         newLi.innerText = `${company.description} - ${company.symbol}`
                         newLi.addEventListener('click', async function()  {
                             searchList.innerHTML = ''
+                            searchInput.value = ''
                             let sharePrice = await fetchSharePrice(company.symbol, company)
                             renderPurchaseTable(company, sharePrice, user)
                         })

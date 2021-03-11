@@ -5,6 +5,15 @@ form {
     padding: 15px;
 }
 
+#right-column {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+#right-column::-webkit-scrollbar { 
+    display: none; 
+}
+
 .list-group {
     background-color: white;
     display: block;
