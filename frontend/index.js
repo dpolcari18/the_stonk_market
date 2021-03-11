@@ -169,8 +169,8 @@ async function createRow(investment, user, tableBody, company=undefined) {
         })
 
     buttonCell.appendChild(sellButton)
-
     newRow.append(companyCell, sharesCell, sharePriceCell, invValueCell, buttonCell )
+    
     tableBody.appendChild(newRow)
 }
 
@@ -380,6 +380,7 @@ async function buyShares(e, user, company) {
         } else {
             document.getElementById('center-column').innerHTML = ''
             renderTable(user)
+            let tableBody = document.getElementById('user-table-body')
             createRow(buyRes, user, tableBody)
         }
     }
