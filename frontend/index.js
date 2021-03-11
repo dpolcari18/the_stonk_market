@@ -183,7 +183,7 @@ async function createRow(investment, tableBody, company=undefined) {
     tableBody.appendChild(newRow)
 }
 
-async function   renderTable(user) {
+async function renderTable(user) {
 
     let leftColumn = document.getElementById('left-column')
         leftColumn.classList = 'col-sm-1'
@@ -196,7 +196,7 @@ async function   renderTable(user) {
         userTable.style.borderRadius = '5px'
         
     let tableHead = document.createElement('thead')
-        tableHead.classList.add('fixed-header')
+        tableHead.id = 'user-table-head'
 
     let headerRow = document.createElement('tr')
 
@@ -214,7 +214,6 @@ async function   renderTable(user) {
 
     let tableBody = document.createElement('tbody')
         tableBody.id = 'user-table-body'
-        tableBody.classList.add('scroll-table')
 
     user.investments.forEach(investment => {
         createRow(investment, tableBody)
