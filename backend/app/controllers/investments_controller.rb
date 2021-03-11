@@ -10,4 +10,11 @@ class InvestmentsController < ApplicationController
         investment.destroy
         render json: investment
     end
+
+    def create
+        investment = Investment.new(user_id: params[:user_id], company_id: params[:company_id], quantity: params[:quantity])
+        
+        investment.save
+        render json: investment
+    end
 end

@@ -126,6 +126,7 @@ function renderSellForm(investment, sharePrice, company, newRow) {
 }
 
 async function createRow(investment, user, tableBody) {
+    
     let newRow = document.createElement('tr')
         newRow.dataset.investmentId = `${investment.id}`
 
@@ -190,6 +191,7 @@ async function renderTable(user) {
         valueHeader.innerText = 'Total Value'
 
     let tableBody = document.createElement('tbody')
+        tableBody.id = 'user-table-body'
 
     user.investments.forEach(investment => {
         createRow(investment, user, tableBody)
@@ -224,7 +226,7 @@ async function removeWatchlist(e, company) {
     console.log(delStatus)
 }
 
-async function createCard(company) {
+async function createCard(company, user) {
 
     let rightColumn = document.getElementById('right-column')
 
@@ -264,6 +266,9 @@ async function createCard(company) {
     let buy = document.createElement('a')
         buy.innerText = 'BUY'
         buy.classList.add('card-link')
+        buy.addEventListener('click', () => {
+            renderPurchaseForm(user, company, showCompany.description)
+        })
 
     let remove = document.createElement('a')
         remove.innerText = 'Remove'
@@ -282,7 +287,7 @@ async function createCard(company) {
 function renderCards(user) {
     let rightColumn = document.getElementById('right-column')
         rightColumn.innerHTML = ''
-    user.watchlists.forEach(company => createCard(company))
+    user.watchlists.forEach(company => createCard(company, user))
 }
 
 async function followCompany(company, user) {
@@ -308,6 +313,95 @@ async function followCompany(company, user) {
     } else if (resp.status === 'error') {
             alert(resp.errors)
     }
+}
+
+async function buyShares(e, user, company) {
+    let companyId = company.symbol ? company.id : company.company_id
+    let tableBody = document.getElementById('user-table-body')
+
+    let newInv = {
+        user_id: user.id,
+        company_id: companyId,
+        quantity: +e.target.shares.value
+    }
+    
+    let reqObj = {
+        headers: {
+            "Content-Type": "application/json"
+        },
+        method: "POST",
+        body: JSON.stringify(newInv)
+    }
+    
+    const buy = await fetch(INV_URL, reqObj)
+    const buyRes = await buy.json()
+    if (tableBody) {
+        createRow(buyRes, user, tableBody)
+    } else {
+        document.getElementById('center-column').innerHTML = ''
+        renderTable(user)
+    }
+}
+
+function renderPurchaseForm(user, company, companyName=undefined) {
+
+    if (document.getElementById('buy-div')) {
+        document.getElementById('buy-div').remove()
+    }
+
+    let centerColumn = document.getElementById('center-column')
+
+    let buyDiv = document.createElement('div')
+        buyDiv.id = 'buy-div'
+    
+    let buyForm = document.createElement('form')
+        buyForm.id = "buy-form"
+        buyForm.addEventListener('submit', (e) => {
+            e.preventDefault()
+            e.target.parentElement.remove()
+            buyShares(e, user, company)
+        })
+    let description = companyName ? companyName : company.description
+
+    let buyTitle = document.createElement('h4')
+        buyTitle.innerText = `Buy ${description} Shares`
+
+    let inputDiv = document.createElement('div')
+
+    let sharesLabel = document.createElement('label')
+        sharesLabel.innerText = 'Shares: '    
+
+    let sharesInput = document.createElement('input')
+        sharesInput.placeholder = 'Enter Number of Shares'
+        sharesInput.name = 'shares'
+
+    inputDiv.append(sharesLabel, sharesInput)
+
+    let value = document.createElement('div')
+        value = "Value: NEED TO FIGURE THIS OUT"
+
+    let buttonDiv = document.createElement('div')
+        buttonDiv.classList.add('btn-toolbar')
+
+    let cancelButton = document.createElement('button')
+        cancelButton.classList.add('btn', 'btn-secondary')
+        cancelButton.innerText = 'Cancel'
+        cancelButton.style.margin = 'auto'
+
+        cancelButton.addEventListener('click', () => {
+            buyDiv.remove()
+        })
+
+    let buyButton = document.createElement('button')
+        buyButton.classList.add('btn', 'btn-success')
+        buyButton.innerText = 'BUY'
+        buyButton.style.margin = 'auto'
+
+    buttonDiv.append(cancelButton, buyButton)
+    
+    buyForm.append(buyTitle, inputDiv, value, buttonDiv)
+    buyDiv.appendChild(buyForm)
+    centerColumn.appendChild(buyDiv)
 }
 
 function renderPurchaseTable(company, sharePrice, user) {
@@ -353,6 +447,9 @@ function renderPurchaseTable(company, sharePrice, user) {
     let buyBtn = document.createElement('button')
         buyBtn.classList.add('btn', 'btn-success')
         buyBtn.innerText = 'BUY'
+        buyBtn.addEventListener('click', () => {
+            renderPurchaseForm(user, company)
+        })
 
     let follow = document.createElement('td')
 
