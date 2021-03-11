@@ -44,11 +44,12 @@ async function sellShares(e, investment, newRow, sellDiv) {
             method: "DELETE"
         }
 
-        await sellInvestment(sellObj, investment)
-        sellDiv.remove()
-        newRow.remove()
+        await sellInvestment(sellObj, investment).then(sellDiv.remove()).then(newRow.remove())
+        
 
-    } else {
+    } else if (+e.target.shares.value <= 0) {
+        window.alert("Quantity must be greater than 0")
+    } else if (+e.target.shares.value <= investment.quantity) {
         //PATCH Request
         let updatedObj = {
             id: investment.id,
@@ -68,19 +69,33 @@ async function sellShares(e, investment, newRow, sellDiv) {
         
         newRow.children[1].innerText = sold.quantity
         newRow.children[3].innerText = `$${(sold.quantity*(+newRow.children[2].innerText.substring(1))).toFixed(2)}`
+    } else {
+        window.alert("You can't sell more shares than you own, unfortunately!")
     }
 }
 
 function renderSellForm(investment, sharePrice, company, newRow) {
+    
     let centerColumn = document.getElementById('center-column')
 
+    if (document.getElementById('sell-div')) {
+        document.getElementById('sell-div').remove()
+    }
+
+    if (document.getElementById('buy-div')) {
+        document.getElementById('buy-div').remove()
+    }
+
     let sellDiv = document.createElement('div')
+        sellDiv.id = 'sell-div'
     
     let sellForm = document.createElement('form')
         sellForm.id = "sell-form"
         sellForm.addEventListener('submit', (e) => {
             e.preventDefault()
-            sellShares(e, investment, newRow, sellDiv)
+            if (window.confirm(`Confirm Sale: ${e.target.shares.value} share(s) of ${company.description} for $${((+e.target.shares.value)*(sharePrice["c"]).toFixed(2))}?`)) {
+                sellShares(e, investment, newRow, sellDiv)
+            }
         })
     
     let sellTitle = document.createElement('h4')
@@ -96,9 +111,6 @@ function renderSellForm(investment, sharePrice, company, newRow) {
         sharesInput.name = 'shares'
 
     inputDiv.append(sharesLabel, sharesInput)
-
-    let value = document.createElement('div')
-        value = "Value: NEED TO FIGURE THIS OUT"
 
     let buttonDiv = document.createElement('div')
         buttonDiv.classList.add('btn-toolbar')
@@ -119,19 +131,19 @@ function renderSellForm(investment, sharePrice, company, newRow) {
 
     buttonDiv.append(cancelButton, sellButton)
     
-    sellForm.append(sellTitle, inputDiv, value, buttonDiv)
+    sellForm.append(sellTitle, inputDiv, buttonDiv)
     sellDiv.appendChild(sellForm)
     centerColumn.appendChild(sellDiv)
 }
 
-async function createRow(investment, user, tableBody) {
+async function createRow(investment, user, tableBody, company=undefined) {
     
     let newRow = document.createElement('tr')
         newRow.dataset.investmentId = `${investment.id}`
 
     let companyCell = document.createElement('td')
-    let company =  user.companies.find(company => company.id === investment.company_id)
-        companyCell.innerText = `${company.description} - ${company.symbol}`
+    let rowCompany =  company ? company : compSearchList.find(comp => comp.id === investment.company_id)
+        companyCell.innerText = `${rowCompany.description} - ${rowCompany.symbol}`
         companyCell.classList.add('align-middle')
         
     let sharesCell = document.createElement('td')
@@ -140,7 +152,7 @@ async function createRow(investment, user, tableBody) {
         
     let sharePriceCell = document.createElement('td')
         sharePriceCell.classList.add('align-middle')
-    let sharePrice = await fetchSharePrice(company.symbol)
+    let sharePrice = await fetchSharePrice(rowCompany.symbol)
         sharePriceCell.innerText = `$${sharePrice["c"]}`
 
     let invValueCell = document.createElement('td')
@@ -153,7 +165,7 @@ async function createRow(investment, user, tableBody) {
         sellButton.innerText = 'SELL'
         sellButton.classList.add('btn', 'btn-outline-success', 'btn-sm')
         sellButton.addEventListener('click', () => {
-            renderSellForm(investment, sharePrice, company, newRow)
+            renderSellForm(investment, sharePrice, rowCompany, newRow)
         })
 
     buttonCell.appendChild(sellButton)
@@ -163,6 +175,7 @@ async function createRow(investment, user, tableBody) {
 }
 
 async function renderTable(user) {
+    // debugger
     let leftColumn = document.getElementById('left-column')
         leftColumn.classList = 'col-sm-1'
     
@@ -264,7 +277,8 @@ async function createCard(company, user) {
         buy.innerText = 'BUY'
         buy.classList.add('card-link')
         buy.addEventListener('click', () => {
-            renderPurchaseForm(user, company, showCompany.description)
+            let confirmCompany = compSearchList.find(comp => comp.id === company.company_id)
+            renderPurchaseForm(user, confirmCompany, showCompany.description)
         })
 
     let remove = document.createElement('a')
@@ -339,7 +353,8 @@ async function buyShares(e, user, company) {
             updateRow[0].childNodes[1].innerText = patchRes.quantity
         } else {
             document.getElementById('center-column').innerHTML = ''
-            renderTable(user)
+            let newUser = await fetchUser(user)
+            renderTable(newUser)
         } 
     } else {
         //POST
@@ -360,7 +375,7 @@ async function buyShares(e, user, company) {
         const buy = await fetch(INV_URL, reqObj)
         const buyRes = await buy.json()
         if (tableBody) {
-            createRow(buyRes, user, tableBody)
+            createRow(buyRes, user, tableBody, company)
         } else {
             document.getElementById('center-column').innerHTML = ''
             renderTable(user)
@@ -369,9 +384,13 @@ async function buyShares(e, user, company) {
 }
 
 function renderPurchaseForm(user, company, companyName=undefined) {
-
+    
     if (document.getElementById('buy-div')) {
         document.getElementById('buy-div').remove()
+    }
+
+    if (document.getElementById('sell-div')) {
+        document.getElementById('sell-div').remove()
     }
 
     let centerColumn = document.getElementById('center-column')
@@ -381,10 +400,14 @@ function renderPurchaseForm(user, company, companyName=undefined) {
     
     let buyForm = document.createElement('form')
         buyForm.id = "buy-form"
-        buyForm.addEventListener('submit', (e) => {
+        buyForm.addEventListener('submit', async function(e) {
             e.preventDefault()
-            e.target.parentElement.remove()
-            buyShares(e, user, company)
+            let pricing = await fetchSharePrice(company.symbol)
+
+            if (window.confirm(`Confirm Purchase: ${e.target.shares.value} share(s) of ${company.description} for $${((+e.target.shares.value)*(pricing["c"])).toFixed(2)}?`)) {
+                e.target.parentElement.remove()
+                buyShares(e, user, company)
+            }
         })
     let description = companyName ? companyName : company.description
 
@@ -401,9 +424,6 @@ function renderPurchaseForm(user, company, companyName=undefined) {
         sharesInput.name = 'shares'
 
     inputDiv.append(sharesLabel, sharesInput)
-
-    let value = document.createElement('div')
-        value = "Value: NEED TO FIGURE THIS OUT"
 
     let buttonDiv = document.createElement('div')
         buttonDiv.classList.add('btn-toolbar')
@@ -424,7 +444,7 @@ function renderPurchaseForm(user, company, companyName=undefined) {
 
     buttonDiv.append(cancelButton, buyButton)
     
-    buyForm.append(buyTitle, inputDiv, value, buttonDiv)
+    buyForm.append(buyTitle, inputDiv, buttonDiv)
     buyDiv.appendChild(buyForm)
     centerColumn.appendChild(buyDiv)
 }
@@ -543,6 +563,7 @@ function renderUserPage(user) {
 }
 
 async function fetchUser(currentUser) {
+    
     const loggedIn = await fetch(USERS_URL+currentUser.id)
     const foundUser = await loggedIn.json()
 
