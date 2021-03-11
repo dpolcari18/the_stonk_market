@@ -602,7 +602,9 @@ async function signUp(username, first_name, last_name) {
     const postedUser = await createUser.json()
     
     if (postedUser.status === "success") {
-        fetchUser(postedUser.user)
+        // renderUserPage(postedUser.user)
+        let message = `Thanks for signing up ${postedUser.user.first_name} ${postedUser.user.last_name}. \n Please log in.`
+        createForm(message)
     } else if (postedUser.status === "error") {
         alert(postedUser.errors.join('\n'))
     }
@@ -684,7 +686,12 @@ async function getUsers(user) {
     findUser(parsedUsers, user)
 }
 
-function createForm() {
+function createForm(message=undefined) {
+
+    if (message) {
+        alert(message)
+    }
+
     let formDiv = document.getElementById('center-column')
         formDiv.innerHTML = ''
 
