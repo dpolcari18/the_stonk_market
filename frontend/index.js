@@ -242,8 +242,6 @@ async function removeWatchlist(e, company) {
 
 async function createCard(company, user) {
 
-    globalUser = await fetchUser(user)
-
     let rightColumn = document.getElementById('right-column')
 
     let newCard = document.createElement('div')
@@ -284,7 +282,7 @@ async function createCard(company, user) {
         buy.classList.add('card-link')
         buy.addEventListener('click', () => {
             let confirmCompany = compSearchList.find(comp => comp.id === company.company_id)
-            renderPurchaseForm(globalUser, confirmCompany, showCompany.description)
+            renderPurchaseForm(user, confirmCompany, showCompany.description)
         })
 
     let remove = document.createElement('a')
@@ -312,6 +310,7 @@ async function renderCards(user) {
 }
 
 async function followCompany(company, user) {
+    
     globalUser = await fetchUser(user)
 
     let newFollow = {
@@ -332,7 +331,7 @@ async function followCompany(company, user) {
     
 
     if (resp.status === 'success'){
-        createCard(resp.watchlist)
+        createCard(resp.watchlist, globalUser)
     } else if (resp.status === 'error') {
             alert(resp.errors)
     }
@@ -519,8 +518,7 @@ async function renderPurchaseTable(company, sharePrice, user) {
         followBtn.classList.add('btn', 'btn-outline-secondary')
         followBtn.innerText = 'Follow'
         followBtn.addEventListener('click', () => {
-            // working here
-            followCompany(company, user)
+            followCompany(company, globalUser)
         })
 
     buy.appendChild(buyBtn)
