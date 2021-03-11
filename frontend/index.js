@@ -34,7 +34,6 @@ async function sellInvestment(sellObj, investment) {
 }
 
 async function sellShares(e, investment, newRow, sellDiv) {
-    console.log(e, investment, newRow)
     
     if (+e.target.shares.value === investment.quantity) {
         //DELETE Request
@@ -68,7 +67,7 @@ async function sellShares(e, investment, newRow, sellDiv) {
         sellDiv.remove()
         
         newRow.children[1].innerText = sold.quantity
-        newRow.children[3].innerText = `$${sold.quantity*(+newRow.children[2].innerText.substring(1))}`
+        newRow.children[3].innerText = `$${(sold.quantity*(+newRow.children[2].innerText.substring(1))).toFixed(2)}`
     }
 }
 
@@ -222,8 +221,6 @@ async function removeWatchlist(e, company) {
     const delStatus = await delWatchlist.json()
 
     e.target.parentElement.parentElement.parentElement.remove()
-
-    console.log(delStatus)
 }
 
 async function createCard(company, user) {
@@ -318,7 +315,7 @@ async function followCompany(company, user) {
 async function buyShares(e, user, company) {
     let companyId = company.symbol ? company.id : company.company_id
     let tableBody = document.getElementById('user-table-body')
-
+    // debugger
     let newInv = {
         user_id: user.id,
         company_id: companyId,
