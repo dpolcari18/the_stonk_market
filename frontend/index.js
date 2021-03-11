@@ -700,9 +700,24 @@ function createForm(message=undefined) {
 
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault()
-        if (document.activeElement.innerText === 'Login') {
-        let user = e.target.username.value
-        getUsers(user)
+
+        loginBtn.disable = true
+        loginBtn.innerText = ''
+
+        let loginSpan = document.createElement('span')
+            loginSpan.classList.add('spinner-border', 'spinner-border-sm')
+            loginSpan.setAttribute('role', 'status')
+            loginSpan.setAttribute('aria-hidden', true)
+
+        let loadingSpan = document.createElement('span')
+            loadingSpan.classList.add('visual-hidden')
+            loadingSpan.innerText = 'Loading...'
+
+        loginBtn.append(loginSpan, loadingSpan)
+
+        if (document.activeElement.innerText === 'Loading...') {
+            let user = e.target.username.value
+            getUsers(user)
         } else if (document.activeElement.innerText === 'Sign Up') {
             renderSignUpForm(loginForm, formDiv)
         }
