@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 async function fetchCompanies() {
     const res = await fetch(COMP_URL)
     compSearchList = await res.json()
+
 }
 
 async function fetchSharePrice(symbol, company=undefined) {
@@ -34,7 +35,8 @@ async function sellInvestment(sellObj, investment) {
 }
 
 async function sellShares(e, investment, newRow, sellDiv) {
-    
+    // console.log(investment.quantity)
+    // debugger
     if (+e.target.shares.value === investment.quantity) {
         //DELETE Request
         let sellObj = {
@@ -51,9 +53,10 @@ async function sellShares(e, investment, newRow, sellDiv) {
         window.alert("Quantity must be greater than 0")
     } else if (+e.target.shares.value <= investment.quantity) {
         //PATCH Request
+    
         let updatedObj = {
             id: investment.id,
-            quantity: investment.quantity-e.target.shares.value
+            quantity: investment.quantity-(+e.target.shares.value)
         }
         
         let sellObj = {
@@ -66,7 +69,7 @@ async function sellShares(e, investment, newRow, sellDiv) {
 
         let sold = await sellInvestment(sellObj, investment)
         sellDiv.remove()
-        
+        investment.quantity = investment.quantity-(+e.target.shares.value)
         newRow.children[1].innerText = sold.quantity
         newRow.children[3].innerText = `$${(sold.quantity*(+newRow.children[2].innerText.substring(1))).toFixed(2)}`
     } else {
@@ -175,7 +178,7 @@ async function createRow(investment, user, tableBody, company=undefined) {
 }
 
 async function renderTable(user) {
-    // debugger
+    
     let leftColumn = document.getElementById('left-column')
         leftColumn.classList = 'col-sm-1'
     
@@ -379,9 +382,10 @@ async function buyShares(e, user, company) {
             createRow(buyRes, user, tableBody, company)
         } else {
             document.getElementById('center-column').innerHTML = ''
-            renderTable(user)
-            let tableBody = document.getElementById('user-table-body')
-            createRow(buyRes, user, tableBody)
+            let newUser = await fetchUser(user)
+            renderTable(newUser)
+            // let tableBody = document.getElementById('user-table-body')
+            // createRow(buyRes, newUser, tableBody)
         }
     }
 }
