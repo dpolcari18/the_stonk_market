@@ -72,7 +72,7 @@ async function sellShares(e, investment, newRow, sellDiv) {
         sellDiv.remove()
         investment.quantity = investment.quantity-(+e.target.shares.value)
         newRow.children[1].innerText = sold.quantity
-        newRow.children[3].innerText = `$${(sold.quantity*(+newRow.children[2].innerText.substring(1))).toFixed(2)}`
+        newRow.children[3].innerText = `$${(sold.quantity*(Number(newRow.children[2].innerText.replace(/[^0-9\.-]+/g,"")))).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
     } else {
         window.alert("You can't sell more shares than you own, unfortunately!")
     }
@@ -102,7 +102,7 @@ function renderSellForm(investment, sharePrice, company, newRow) {
 
             let pricing = await fetchSharePrice(company.symbol)
 
-            if (window.confirm(`Confirm Sale: ${e.target.shares.value} share(s) of ${company.description} for $${((+e.target.shares.value)*(sharePrice["c"])).toFixed(2)}?`)) {
+            if (window.confirm(`Confirm Sale: ${e.target.shares.value} share(s) of ${company.description} for $${((+e.target.shares.value)*(sharePrice["c"])).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}?`)) {
                 sellShares(e, investment, newRow, sellDiv)
             }
         })
@@ -162,11 +162,11 @@ async function createRow(investment, tableBody, company=undefined) {
     let sharePriceCell = document.createElement('td')
         sharePriceCell.classList.add('align-middle')
     let sharePrice = await fetchSharePrice(rowCompany.symbol)
-        sharePriceCell.innerText = `$${sharePrice["c"]}`
+        sharePriceCell.innerText = `$${(sharePrice["c"]).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
 
     let invValueCell = document.createElement('td')
         invValueCell.classList.add('align-middle')
-        invValueCell.innerText = '$'+((sharePrice["c"]*sharesCell.innerText).toFixed(2))
+        invValueCell.innerText = '$'+(((sharePrice["c"]*sharesCell.innerText)).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}))
 
     let buttonCell = document.createElement('td')
 
@@ -183,7 +183,7 @@ async function createRow(investment, tableBody, company=undefined) {
     tableBody.appendChild(newRow)
 }
 
-async function renderTable(user) {
+async function   renderTable(user) {
 
     let leftColumn = document.getElementById('left-column')
         leftColumn.classList = 'col-sm-1'
@@ -268,17 +268,17 @@ async function createCard(company, user) {
 
     let price = document.createElement('h4')
         price.classList.add('card-subtitle')
-        price.innerText = `Current: $${(sharePrice["c"]).toFixed(2)}`
+        price.innerText = `Current: $${(sharePrice["c"]).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
 
     let dailyDiv = document.createElement('div')
 
     let high = document.createElement('h5')
         high.classList.add('card-subtitle')
-        high.innerText = `High: $${(sharePrice["h"]).toFixed(2)}`
+        high.innerText = `High: $${(sharePrice["h"]).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
     
     let low = document.createElement('h5')
         low.classList.add('card-subtitle')
-        low.innerText = `Low: $${(sharePrice["l"]).toFixed(2)}`
+        low.innerText = `Low: $${(sharePrice["l"]).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
 
     dailyDiv.append(high,low)
 
@@ -428,7 +428,7 @@ function renderPurchaseForm(user, company, companyName=undefined) {
 
             let pricing = await fetchSharePrice(company.symbol)
 
-            if (window.confirm(`Confirm Purchase: ${e.target.shares.value} share(s) of ${company.description} for $${((+e.target.shares.value)*(pricing["c"])).toFixed(2)}?`)) {
+            if (window.confirm(`Confirm Purchase: ${e.target.shares.value} share(s) of ${company.description} for $${((+e.target.shares.value)*(pricing["c"])).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}?`)) {
                 e.target.parentElement.remove()
                 buyShares(e, user, company)
             }
