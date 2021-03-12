@@ -153,22 +153,23 @@ async function createRow(investment, tableBody, company=undefined) {
     let companyCell = document.createElement('td')
     let rowCompany =  company ? company : compSearchList.find(comp => comp.id === investment.company_id)
         companyCell.innerText = `${rowCompany.description} - ${rowCompany.symbol}`
-        companyCell.classList.add('align-middle')
+        companyCell.classList.add('user-table-td')
         
     let sharesCell = document.createElement('td')
         sharesCell.innerText = `${investment.quantity}`
-        sharesCell.classList.add('align-middle')
+        sharesCell.classList.add('user-table-td')
         
     let sharePriceCell = document.createElement('td')
-        sharePriceCell.classList.add('align-middle')
+        sharePriceCell.classList.add('user-table-td')
     let sharePrice = await fetchSharePrice(rowCompany.symbol)
         sharePriceCell.innerText = `$${(sharePrice["c"]).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
 
     let invValueCell = document.createElement('td')
-        invValueCell.classList.add('align-middle')
+        invValueCell.classList.add('user-table-td')
         invValueCell.innerText = '$'+(((sharePrice["c"]*sharesCell.innerText)).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}))
 
     let buttonCell = document.createElement('td')
+        buttonCell.classList.add('user-table-td')
 
     let sellButton = document.createElement('button')
         sellButton.innerText = 'SELL'
@@ -194,6 +195,7 @@ async function renderTable(user) {
     let userTable = document.createElement('table')
         userTable.classList.add('table', 'table-light', 'table-hover')
         userTable.style.borderRadius = '5px'
+        userTable.id = 'user-table'
         
     let tableHead = document.createElement('thead')
         tableHead.id = 'user-table-head'
@@ -202,15 +204,22 @@ async function renderTable(user) {
 
     let companyHeader = document.createElement('th')
         companyHeader.innerText = 'Company - Symbol'
+        companyHeader.classList.add('user-table-th')
 
     let quantityHeader = document.createElement('th')
         quantityHeader.innerText = 'Shares'
+        quantityHeader.classList.add('user-table-th')
 
     let priceHeader = document.createElement('th')
         priceHeader.innerText = 'Price Per Share'
+        priceHeader.classList.add('user-table-th')
 
     let valueHeader = document.createElement('th')
         valueHeader.innerText = 'Total Value'
+        valueHeader.classList.add('user-table-th')
+
+    let blankHeader = document.createElement('th')
+        blankHeader.classList.add('user-table-th')
 
     let tableBody = document.createElement('tbody')
         tableBody.id = 'user-table-body'
@@ -219,7 +228,7 @@ async function renderTable(user) {
         createRow(investment, tableBody)
         })
 
-    headerRow.append(companyHeader, quantityHeader, priceHeader, valueHeader)
+    headerRow.append(companyHeader, quantityHeader, priceHeader, valueHeader, blankHeader)
     tableHead.appendChild(headerRow)
     userTable.append(tableHead, tableBody)
     centerColumn.appendChild(userTable)

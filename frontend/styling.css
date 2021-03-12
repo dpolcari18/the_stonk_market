@@ -10,16 +10,31 @@ form {
     overflow-y: auto;
 }
 
+#user-table {
+    display: block;
+}
+
 #user-table-head {
-    display: inline-block;
+    display: block;
     width: 100%;
     height: 50px;
+    border-bottom: 10px;
+    border-color: black
 }
+
 #user-table-body {
     height: 300px;
-    display: inline-block;
+    display: block;
     width: 100%;
     overflow: auto;
+}
+
+#user-table-th {
+    width: 20%;
+}
+
+#user-table-td {
+    with: 20%
 }
 
 #right-column::-webkit-scrollbar { 
