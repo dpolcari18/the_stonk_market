@@ -48,7 +48,6 @@ async function sellShares(e, investment, newRow, sellDiv) {
         }
 
         await sellInvestment(sellObj, investment).then(sellDiv.remove()).then(newRow.remove())
-        
 
     } else if (+e.target.shares.value <= 0) {
         window.alert("Quantity must be greater than 0")
@@ -548,7 +547,7 @@ async function renderPurchaseTable(company, sharePrice, user) {
 } 
 
 async function fetchUser(currentUser) {
-    
+
     const loggedIn = await fetch(USERS_URL+currentUser.id)
     let foundUser = await loggedIn.json()
 
@@ -568,8 +567,10 @@ async function renderUserPage(user) {
         navBar.style.display="block"
 
     let homeBtn = document.getElementById('home-btn')
-        homeBtn.addEventListener('click', () => {
+        homeBtn.addEventListener('click', async function() {
         document.getElementById('center-column').innerHTML = ''
+        
+        let globalUser = await fetchUser(user)
 
         renderTable(globalUser)
     })
