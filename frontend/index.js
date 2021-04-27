@@ -733,6 +733,7 @@ function createForm(message=undefined) {
 
     let loginForm = document.createElement('form')
         loginForm.id = 'login-form'
+        loginForm.autocomplete = 'off   '
 
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault()
