@@ -3,7 +3,7 @@
 ---
 ## The Stonk Market
 
-The Stonk Market is a lightweight "stock" trading platform that allows users to search and company listed on the NYSE and either follow that company or purchase "shares" in that company.
+The Stonk Market is a lightweight "stock" trading platform that allows users to search any company listed on the NYSE and either follow that company or purchase "shares" in that company.
 
 --- 
 ## Motivation
